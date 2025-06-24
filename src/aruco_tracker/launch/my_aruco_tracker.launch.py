@@ -7,14 +7,23 @@ from launch_ros.substitutions import FindPackageShare
 def generate_launch_description():
     return LaunchDescription([
         # Run bridge nodes in separate screen sessions
+
+        
         ExecuteProcess(
-            cmd=['screen', '-dmS', 'image_bridge', 'bash', '-c', 'ros2 run ros_gz_bridge parameter_bridge /world/aruco/model/x500_mono_cam_down_0/link/camera_link/sensor/imager/image@sensor_msgs/msg/Image@gz.msgs.Image'],
-            name='image_bridge_process'
+            cmd=[
+                'ros2', 'run', 'ros_gz_bridge', 'parameter_bridge',
+                '/world/aruco/model/x500_mono_cam_down_0/link/camera_link/sensor/imager/image@sensor_msgs/msg/Image@gz.msgs.Image'
+            ],
+            output='screen'
         ),
         ExecuteProcess(
-            cmd=['screen', '-dmS', 'camera_info_bridge', 'bash', '-c', 'ros2 run ros_gz_bridge parameter_bridge /world/aruco/model/x500_mono_cam_down_0/link/camera_link/sensor/imager/camera_info@sensor_msgs/msg/CameraInfo@gz.msgs.CameraInfo'],
-            name='camera_info_bridge_process'
+            cmd=[
+                'ros2', 'run', 'ros_gz_bridge', 'parameter_bridge',
+                '/world/aruco/model/x500_mono_cam_down_0/link/camera_link/sensor/imager/camera_info@sensor_msgs/msg/CameraInfo@gz.msgs.CameraInfo'
+            ],
+            output='screen'
         ),
+               
         # Continue running Aruco tracker node as a normal ROS node and display output on screen
         Node(
             package='aruco_tracker',

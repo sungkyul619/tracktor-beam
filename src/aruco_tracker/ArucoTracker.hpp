@@ -9,6 +9,8 @@
 #include <opencv2/aruco.hpp>
 #include <opencv2/core/quaternion.hpp>
 #include <geometry_msgs/msg/pose_stamped.hpp>
+#include <Eigen/Dense> // cv::Quatd::createFromRotMat이 Eigen을 필요로 할 수 있습니다.
+#include <string> // std::string을 위해 추가
 
 class ArucoTrackerNode : public rclcpp::Node
 {
@@ -40,5 +42,9 @@ private:
 	int _param_aruco_id {};
 	int _param_dictionary {};
 	double _param_marker_size {};
+
+	// --- 새로 추가된 멤버 변수 ---
+    std::string _image_sub_topic;
+    std::string _camera_info_sub_topic;
 };
 

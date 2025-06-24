@@ -1,13 +1,24 @@
 #include "ArucoTracker.hpp"
 #include <sstream>
 
-ArucoTrackerNode::ArucoTrackerNode()
+ArucoTrackerNode::ArucoTrackerNode() //생성자
 	: Node("aruco_tracker_node")
 {
 	RCLCPP_INFO(this->get_logger(), "Starting ArucoTrackerNode");
 
 	loadParameters();
 
+	// RMW QoS settings
+	auto qos = rclcpp::QoS(1).best_effort();
+
+	// Subscribers
+	_image_sub = this->create_subscription<sensor_msgs::msg::Image>(
+			     _image_sub_topic, qos, std::bind(&ArucoTrackerNode::image_callback, this, std::placeholders::_1));
+
+	_camera_info_sub = this->create_subscription<sensor_msgs::msg::CameraInfo>(
+				    _camera_info_sub_topic, qos, std::bind(&ArucoTrackerNode::camera_info_callback, this, std::placeholders::_1));
+
+	
 	// See: https://docs.opencv.org/4.x/d1/dcd/structcv_1_1aruco_1_1DetectorParameters.html
 	auto detectorParams = cv::aruco::DetectorParameters();
 
@@ -16,15 +27,6 @@ ArucoTrackerNode::ArucoTrackerNode()
 
 	_detector = std::make_unique<cv::aruco::ArucoDetector>(dictionary, detectorParams);
 
-	// RMW QoS settings
-	auto qos = rclcpp::QoS(1).best_effort();
-
-	// Subscribers
-	_image_sub = this->create_subscription<sensor_msgs::msg::Image>(
-			     "/camera", qos, std::bind(&ArucoTrackerNode::image_callback, this, std::placeholders::_1));
-
-	_camera_info_sub = this->create_subscription<sensor_msgs::msg::CameraInfo>(
-				   "/camera_info", qos, std::bind(&ArucoTrackerNode::camera_info_callback, this, std::placeholders::_1));
 
 	// Publishers
 	_image_pub = this->create_publisher<sensor_msgs::msg::Image>(
@@ -42,6 +44,21 @@ void ArucoTrackerNode::loadParameters()
 	get_parameter("aruco_id", _param_aruco_id);
 	get_parameter("dictionary", _param_dictionary);
 	get_parameter("marker_size", _param_marker_size);
+
+	// --- 새로 추가된 토픽 이름 파라미터 ---
+    declare_parameter<std::string>("image_sub_topic", "/camera"); // 기본값 설정
+    declare_parameter<std::string>("camera_info_sub_topic", "/camera_info"); // 기본값 설정
+
+    get_parameter("image_sub_topic", _image_sub_topic);
+    get_parameter("camera_info_sub_topic", _camera_info_sub_topic);
+
+	RCLCPP_INFO(this->get_logger(), "Parameters loaded: ");
+    RCLCPP_INFO(this->get_logger(), "  aruco_id: %d", _param_aruco_id);
+    RCLCPP_INFO(this->get_logger(), "  dictionary: %d", _param_dictionary);
+    RCLCPP_INFO(this->get_logger(), "  marker_size: %f", _param_marker_size);
+    RCLCPP_INFO(this->get_logger(), "  image_sub_topic: %s", _image_sub_topic.c_str());
+    RCLCPP_INFO(this->get_logger(), "  camera_info_sub_topic: %s", _camera_info_sub_topic.c_str());
+
 }
 
 void ArucoTrackerNode::image_callback(const sensor_msgs::msg::Image::SharedPtr msg)

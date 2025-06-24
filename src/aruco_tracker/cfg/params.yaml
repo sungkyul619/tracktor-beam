@@ -3,3 +3,5 @@ aruco_tracker:
     aruco_id: 0
     dictionary: 2
     marker_size: 0.5
+    image_sub_topic: /world/aruco/model/x500_mono_cam_down_0/link/camera_link/sensor/imager/image # 여기에 Gazebo 토픽 이름 또는 ROS 브릿지 토픽 이름
+    camera_info_sub_topic: /world/aruco/model/x500_mono_cam_down_0/link/camera_link/sensor/imager/camera_info # 여기에 Gazebo 토픽 이름 또는 ROS 브릿지 토픽 이름
