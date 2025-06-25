@@ -1,3 +1,4 @@
+// main
 #pragma once
 #include <memory>
 #include <rclcpp/rclcpp.hpp>
@@ -8,6 +9,7 @@
 #include <opencv2/aruco.hpp>
 #include <opencv2/core/quaternion.hpp>
 #include <geometry_msgs/msg/pose_stamped.hpp>
+#include <string> // std::string을 위해 추가
 
 class ArucoTrackerNode : public rclcpp::Node
 {
@@ -29,6 +31,10 @@ private:
 	std::unique_ptr<cv::aruco::ArucoDetector> _detector;
 	cv::Mat _camera_matrix;
 	cv::Mat _dist_coeffs;
+
+	// --- 새로 추가된 멤버 변수 ---
+    std::string _image_sub_topic;
+    std::string _camera_info_sub_topic;
 
 	int _param_aruco_id {};
 	int _param_dictionary {};
